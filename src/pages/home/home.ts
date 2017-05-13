@@ -14,8 +14,8 @@ export class HomePage {
 
   openSecondPage() {
     this.navCtrl.push(SecondPage, {
-      id: '2'
-    });
+      test: '123'
+    })
   }
 
 }
