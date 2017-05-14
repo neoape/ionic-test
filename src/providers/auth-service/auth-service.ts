@@ -6,10 +6,12 @@ import 'rxjs/add/operator/map';
 export class User {
   name: string
   email: string
+  password: string
 
-  constructor(name: string, email: string) {
+  constructor(name: string, email: string, password: string) {
     this.name = name
     this.email = email
+    this.password = password
   }
 }
 /*
@@ -20,17 +22,37 @@ export class User {
 */
 @Injectable()
 export class AuthServiceProvider {
-
   private currentUser: User
+  private users: Object[] = [
+    {
+      name: 'roma',
+      email: '123@123.com',
+      password: '123'
+    },
+    {
+      name: 'test',
+      email: 'test@test.com',
+      password: 'test'
+    }
+  ]
 
-  login(credentials) {
+  constructor() {
+    if ("users" in localStorage) {
+      return
+    } else {
+      let serialObj = JSON.stringify(this.users)
+      localStorage.setItem('users', serialObj)
+    }
+  }
+
+  login(credentials){
     if (credentials.email === null || credentials.password === null) {
       return Observable.throw("Please insert credentials")
     } else {
       return Observable.create( observer => {
         // At this point make a request to your backend to make a real check!
         let access = (credentials.password === "pass" && credentials.email === "email");
-        this.currentUser = new User('Roma', 'romafaizov@gmail.com');
+        this.currentUser = new User('Roma', 'romafaizov@gmail.com', '123');
         observer.next(access);
         observer.complete();
       })
@@ -38,10 +60,12 @@ export class AuthServiceProvider {
   }
 
   register(credentials) {
-    if (credentials.email === null || credentials.password === null) {
+    if (credentials.email === null || credentials.password === null || credentials.name === null) {
       return Observable.throw("Please insert credentials")
     } else { 
       return Observable.create( observer => {
+        this.addUser(credentials)
+        this.setUsers()
         observer.next(true)
         observer.complete()
       })
@@ -50,6 +74,16 @@ export class AuthServiceProvider {
 
   getUserInfo(): User {
     return this.currentUser
+  }
+
+  addUser(credentials) {
+    let newUser = new User(credentials.name, credentials.email, credentials.password)
+    this.users.push(newUser)
+  }
+
+  setUsers() {
+    let serialObj = JSON.stringify(this.users)
+    localStorage.setItem('users', serialObj)
   }
 
   logout() {
