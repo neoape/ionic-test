@@ -50,10 +50,10 @@ export class AuthServiceProvider {
       return Observable.throw("Please insert credentials")
     } else {
       return Observable.create( observer => {
-        // At this point make a request to your backend to make a real check!
-        let access = (credentials.password === "pass" && credentials.email === "email");
-        this.currentUser = new User('Roma', 'romafaizov@gmail.com', '123');
-        observer.next(access);
+        for(let item of this.getUsersJs()) {
+          (credentials.password === item.password && credentials.email === item.email) ? this.currentUser = new User(item.name, item.email, item.password) : null
+        }
+        observer.next(this.currentUser);
         observer.complete();
       })
     }
@@ -84,6 +84,10 @@ export class AuthServiceProvider {
   setUsers() {
     let serialObj = JSON.stringify(this.users)
     localStorage.setItem('users', serialObj)
+  }
+
+  getUsersJs() {
+    return JSON.parse(localStorage.getItem('users'))
   }
 
   logout() {

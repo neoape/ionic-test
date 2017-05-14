@@ -1,21 +1,26 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
-import { SecondPage } from '../second/second';
+import { NavController, IonicPage } from 'ionic-angular';
+import { AuthServiceProvider } from '../../providers/auth-service/auth-service'
 
+@IonicPage()
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
 
-  constructor(public navCtrl: NavController) {
+  user = {}
 
+  constructor(
+    public navCtrl: NavController,
+    private auth: AuthServiceProvider) {
+      this.user = this.auth.getUserInfo()
   }
 
-  openSecondPage() {
-    this.navCtrl.push(SecondPage, {
-      test: '123'
-    })
+  logout() {
+    this.auth.logout().subscribe(succ => {
+      this.navCtrl.setRoot('LoginPage')
+    });
   }
 
 }
